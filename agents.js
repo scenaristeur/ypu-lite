@@ -2,6 +2,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 import chalk from "chalk";
 import { getLlama, LlamaChatSession, resolveModelFile } from "node-llama-cpp";
+import { MyCustomChatWrapper } from "./MyCustomChatWrapper.js";
 
 import "dotenv/config";
 import { Sync } from "./lib/sync.js";
@@ -41,7 +42,9 @@ const context = await model.createContext();
 const session = new LlamaChatSession({
   contextSequence: context.getSequence(),
   systemPrompt: systemPrompt,
+  chatWrapper: new MyCustomChatWrapper()
 });
+console.log(session)
 console.log();
 
 const onMessage = async function (m) {
