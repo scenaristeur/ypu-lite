@@ -89,33 +89,45 @@ const onMessage = async function (m) {
     console.log();
     // console.log(response)
     const parsedRes = grammar.parse(response);
-    let message = { text: parsedRes.response, target: parsedRes.speaker }
+    let message = { text: parsedRes.response, target: parsedRes.speaker };
     sync.addMessage(message);
-      const initialChatHistory = session.getChatHistory();
-  console.log(initialChatHistory);
+    const initialChatHistory = session.getChatHistory();
+    console.log(initialChatHistory);
   }
-
 };
 
-const onInit  = function (data) {
-  console.log("should be Initialized with "/*, data*/);
-//   let chatHistory = session.getChatHistory();
-//   console.log("chatHistory", chatHistory);
-//   for (let m of data){
-//     let message = {}
-//     if  (m.role == "ai"){
-// message.type="model"
-// message.response= [`{"response": "Ah, tu as 30 ans, c'est intéressant! Qu'est-ce que tu fais pour passer le temps?", "speaker": "John"}`]
-//     }else{
-//       message.type="user"
-//       message.text= "<speaker>" + m.username + "</speaker>" + m.text
-//     }
-//     chatHistory.push(message)
-//   }
-//   session.setChatHistory(chatHistory);
-//   console.log("chatHistory", chatHistory);
-};
+const onInit = function (data) {
+  console.log("should be Initialized with ", data);
 
+  let chatHistory = session.getChatHistory();
+  // console.log("chatHistory", chatHistory);
+  for (let m of data) {
+    console.log(m);
+    if (m.role == "ai") {
+      let response = [];
+      let r = { response: m.text, speaker: m.target };
+      response.push(JSON.stringify(r));
+      chatHistory.push({ type: "model", response: response });
+    } else {
+      chatHistory.push({
+        type: "user",
+        text: "<speaker>" + m.username + "</speaker>" + m.text,
+      });
+    }
+  }
+  //     let message = {}
+  //     if  (m.role == "ai"){
+  // message.type="model"
+  // message.response= [`{"response": "Ah, tu as 30 ans, c'est intéressant! Qu'est-ce que tu fais pour passer le temps?", "speaker": "John"}`]
+  //     }else{
+  //       message.type="user"
+  //       message.text= "<speaker>" + m.username + "</speaker>" + m.text
+  //     }
+  //     chatHistory.push(message)
+  //   }
+  session.setChatHistory(chatHistory);
+    console.log("chatHistory", chatHistory);
+};
 
 sync_options.onMessage = onMessage;
 sync_options.onInit = onInit;

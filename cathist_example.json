@@ -1,0 +1,16 @@
+[
+    {
+      type: 'system',
+      text: 'Tu participes à une conversation entre plusieurs utilisateurs.\n' +
+        "  Dans le message qu'il envoie, chaque utilisateur est identifié par une balise <speaker>{{username}}</speaker>.\n" +
+        '  Tu ne dois utiliser ces balises que pour savoir qui a parlé.\n' +
+        '  Tu ne dois pas faire apparaitre ces balises dans tes réponses.\n' +
+        '  '
+    },
+    { type: 'user', text: '<speaker>John</speaker>salut' },
+    {
+      type: 'model',
+      response: [ '{"response": "Salut! Comment vas-tu?","speaker": "John"}' ]
+    }
+  ]
+  
