@@ -14,7 +14,11 @@ let sync_options = {
 };
 
 const systemPrompt =
-  "Tu participes à une conversation entre plusieurs utilisateurs. Tu es là pour les aider à résoudre leurs problèmes.";
+  `Tu participes à une conversation entre plusieurs utilisateurs.
+  Dans le message qu'il envoie, chaque utilisateur est identifié par une balise <speaker>{{username}}</speaker>.
+  Tu ne dois utiliser ces balises que pour savoir qui a parlé.
+  Tu ne dois pas faire apparaitre ces balises dans tes réponses.
+  `;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const modelsDirectory = path.join(__dirname, "..", "models");
@@ -44,7 +48,7 @@ const session = new LlamaChatSession({
   systemPrompt: systemPrompt,
   chatWrapper: new MyCustomChatWrapper()
 });
-console.log(session)
+// console.log(session)
 console.log();
 
 const onMessage = async function (m) {
@@ -52,7 +56,7 @@ const onMessage = async function (m) {
     console.log(chalk.yellow("AI: "));
     console.log(m);
     const response = await session.prompt(
-      "speaker:" + m.username + "\n" + "text:" + m.text
+      "<speaker>"+m.username + "</speaker>"  + m.text
     );
     console.log(chalk.yellow("AI response: ") + response);
     console.log();

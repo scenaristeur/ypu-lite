@@ -90,9 +90,12 @@ export class MyCustomChatWrapper extends Llama3_2LightweightChatWrapper {
             }
 
             if (item.user != null) {
+                let splitted =item.user.toString().split("</speaker>")
+                let name    = splitted[0].replace("<speaker>","")
+                console.log(splitted)
                 res.push(
                     LlamaText([
-                        new SpecialTokensText("<|start_header_id|>user<|end_header_id|>\n\n"),
+                        new SpecialTokensText("<|start_header_id|>user:"+name+"<|end_header_id|>\n\n"),
                         item.user,
                         new SpecialToken("EOT")
                     ])
@@ -115,6 +118,7 @@ export class MyCustomChatWrapper extends Llama3_2LightweightChatWrapper {
         })
     );
 
+    console.log("contextText", contextText);
     return {
         contextText,
         stopGenerationTriggers: [

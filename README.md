@@ -22,3 +22,7 @@ npm run dev John
 # or 
 npm run dev Jane
 ```
+
+# voice 
+- https://github.com/ictnlp/LLaMA-Omni
+- https://medium.com/@mahendra0203/ears-for-ai-making-llama-listen-and-learn-c506ac72da39
