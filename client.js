@@ -5,7 +5,8 @@ import { Sync } from './lib/sync.js'
 let sync_options = {
   url: process.env.SYNC_URL,
   room: process.env.SYNC_ROOM,
-  debug: process.env.SYNC_DEBUG
+  role: "human-cli",
+  debug: process.env.SYNC_DEBUG,
 }
 const rl = readline.createInterface({
   input: process.stdin,
@@ -22,7 +23,6 @@ function promptUser() {
       if(input.length>0) {
         sync.addMessage({text: input})
       }
-
       promptUser()
     }
   })
