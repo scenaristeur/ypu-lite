@@ -87,13 +87,37 @@ const onMessage = async function (m) {
     );
     console.log(chalk.yellow("AI response: ") + response);
     console.log();
+    // console.log(response)
     const parsedRes = grammar.parse(response);
-    let message = { text: "@"+parsedRes.speaker + " " + parsedRes.response }
+    let message = { text: parsedRes.response, target: parsedRes.speaker }
     sync.addMessage(message);
+      const initialChatHistory = session.getChatHistory();
+  console.log(initialChatHistory);
   }
-  // const initialChatHistory = session.getChatHistory();
-  // console.log(initialChatHistory);
+
 };
+
+const onInit  = function (data) {
+  console.log("should be Initialized with "/*, data*/);
+//   let chatHistory = session.getChatHistory();
+//   console.log("chatHistory", chatHistory);
+//   for (let m of data){
+//     let message = {}
+//     if  (m.role == "ai"){
+// message.type="model"
+// message.response= [`{"response": "Ah, tu as 30 ans, c'est intéressant! Qu'est-ce que tu fais pour passer le temps?", "speaker": "John"}`]
+//     }else{
+//       message.type="user"
+//       message.text= "<speaker>" + m.username + "</speaker>" + m.text
+//     }
+//     chatHistory.push(message)
+//   }
+//   session.setChatHistory(chatHistory);
+//   console.log("chatHistory", chatHistory);
+};
+
+
 sync_options.onMessage = onMessage;
+sync_options.onInit = onInit;
 let sync = new Sync(sync_options);
 sync.setUsername("ai");
