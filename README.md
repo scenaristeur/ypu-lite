@@ -13,3 +13,4 @@ running at 'localhost' on port 1234
 
 # multiple users
 in multiple terminals open ```npm run dev```
+- see grammar https://node-llama-cpp.withcat.ai/guide/#chatbot-with-json-schema

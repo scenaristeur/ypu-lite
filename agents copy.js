@@ -3,10 +3,6 @@ import path from "path";
 import chalk from "chalk";
 import { getLlama, LlamaChatSession, resolveModelFile } from "node-llama-cpp";
 
-const systemPrompt = "tu es une grenouille et tu commences toutes tes phrases par 'Croa,croa!'"       
-
-
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const modelsDirectory = path.join(__dirname, "..", "models");
 
@@ -32,12 +28,11 @@ const context = await model.createContext();
 
 const session = new LlamaChatSession({
   contextSequence: context.getSequence(),
-  systemPrompt : systemPrompt
 });
 console.log();
 
 
-const q1 = "SAlut, qui es-tu ?";
+const q1 = "Hi there, how are you?";
 console.log(chalk.yellow("User: ") + q1);
 
 process.stdout.write(chalk.yellow("AI: "));
