@@ -2,26 +2,32 @@
 
 https://www.radiofrance.fr/fip/radio-groove
 
-# YJS provider
-https://docs.yjs.dev/ecosystem/connection-provider/y-websocket
+# run multiuser chat
+in 4 different terminals
 
+- run the provider 
 ```
 HOST=localhost PORT=1234 npx y-websocket
-running at 'localhost' on port 1234
 
 ```
-
-# multiple users
-in multiple terminals open ```npm run dev```
-- see grammar https://node-llama-cpp.withcat.ai/guide/#chatbot-with-json-schema
-
-
-# Or run with a username
+- run the agent
+```
+npm run agent
+```
+- run 2 or more users
+ 
 ```bash
 npm run dev John
 # or 
 npm run dev Jane
 ```
+
+# YJS provider
+https://docs.yjs.dev/ecosystem/connection-provider/y-websocket
+
+# multiple users
+in multiple terminals open ```npm run dev```
+- see grammar https://node-llama-cpp.withcat.ai/guide/#chatbot-with-json-schema
 
 # voice 
 - https://github.com/ictnlp/LLaMA-Omni

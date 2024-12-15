@@ -13,11 +13,11 @@ let sync_options = {
   debug: process.env.SYNC_DEBUG,
 };
 
-const systemPrompt = `Tu participes à une conversation entre plusieurs utilisateurs.
-  Dans le message qu'il envoie, chaque utilisateur est identifié par une balise <speaker>{{username}}</speaker>.
-  Tu ne dois utiliser ces balises que pour savoir qui a parlé.
-  Tu ne dois pas faire apparaitre ces balises dans tes réponses.
-  `;
+// const systemPrompt = `Tu participes à une conversation entre plusieurs utilisateurs.
+//   Dans le message qu'il envoie, chaque utilisateur est identifié par une balise <speaker>{{username}}</speaker>.
+//   Tu ne dois utiliser ces balises que pour savoir qui a parlé.
+//   Tu ne dois pas faire apparaitre ces balises dans tes réponses.
+//   `;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const modelsDirectory = path.join(__dirname, "..", "models");
@@ -39,6 +39,9 @@ const grammar = await llama.createGrammarForJsonSchema({
     response: {
       type: "string",
     },
+    // action: {
+    //   type: "string",
+    // },
     speaker: {
       oneOf: [
         {
@@ -71,7 +74,7 @@ const context = await model.createContext();
 
 const session = new LlamaChatSession({
   contextSequence: context.getSequence(),
-  systemPrompt: systemPrompt,
+  // systemPrompt: systemPrompt,
   chatWrapper: new MyCustomChatWrapper(),
 });
 // console.log(session)
