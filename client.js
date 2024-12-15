@@ -27,7 +27,6 @@ function promptUser() {
     }
   })
 }
-console.log(sync_options)
 
 sync_options.promptUser = promptUser
 let sync = new Sync(sync_options)
