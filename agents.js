@@ -13,8 +13,7 @@ let sync_options = {
   debug: process.env.SYNC_DEBUG,
 };
 
-const systemPrompt =
-  `Tu participes à une conversation entre plusieurs utilisateurs.
+const systemPrompt = `Tu participes à une conversation entre plusieurs utilisateurs.
   Dans le message qu'il envoie, chaque utilisateur est identifié par une balise <speaker>{{username}}</speaker>.
   Tu ne dois utiliser ces balises que pour savoir qui a parlé.
   Tu ne dois pas faire apparaitre ces balises dans tes réponses.
@@ -25,6 +24,33 @@ const modelsDirectory = path.join(__dirname, "..", "models");
 
 const llama = await getLlama();
 
+const grammar = await llama.createGrammarForJsonSchema({
+  type: "object",
+  properties: {
+    // positiveWordsInUserMessage: {
+    //   type: "array",
+    //   items: {
+    //     type: "string",
+    //   },
+    // },
+    // userMessagePositivityScoreFromOneToTen: {
+    //   enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    // },
+    response: {
+      type: "string",
+    },
+    speaker: {
+      oneOf: [
+        {
+          type: "null",
+        },
+        {
+          type: "string",
+        },
+      ],
+    },
+  },
+});
 console.log(chalk.yellow("Resolving model file..."));
 // const modelPath = await resolveModelFile(
 //     // "hf:mradermacher/Llama-3.2-3B-Instruct-GGUF/Llama-3.2-3B-Instruct.Q4_K_M.gguf",
@@ -46,7 +72,7 @@ const context = await model.createContext();
 const session = new LlamaChatSession({
   contextSequence: context.getSequence(),
   systemPrompt: systemPrompt,
-  chatWrapper: new MyCustomChatWrapper()
+  chatWrapper: new MyCustomChatWrapper(),
 });
 // console.log(session)
 console.log();
@@ -56,12 +82,17 @@ const onMessage = async function (m) {
     console.log(chalk.yellow("AI: "));
     console.log(m);
     const response = await session.prompt(
-      "<speaker>"+m.username + "</speaker>"  + m.text
+      "<speaker>" + m.username + "</speaker>" + m.text,
+      { grammar }
     );
     console.log(chalk.yellow("AI response: ") + response);
     console.log();
-    sync.addMessage({ text: response });
+    const parsedRes = grammar.parse(response);
+    let message = { text: "@"+parsedRes.speaker + " " + parsedRes.response }
+    sync.addMessage(message);
   }
+  // const initialChatHistory = session.getChatHistory();
+  // console.log(initialChatHistory);
 };
 sync_options.onMessage = onMessage;
 let sync = new Sync(sync_options);
