@@ -3,6 +3,11 @@ import path from "path";
 import chalk from "chalk";
 import { getLlama, LlamaChatSession, resolveModelFile } from "node-llama-cpp";
 import { MyCustomChatWrapper } from "./MyCustomChatWrapper.js";
+import { VectorDb } from "./lib/vectordb.js";
+
+let vectordb = new VectorDb({
+  databaseDir: "./database",
+});
 
 import "dotenv/config";
 import { Sync } from "./lib/sync.js";
@@ -24,7 +29,7 @@ Vous jouez à un jeu sur un echiquier marqué A à H et 1 à 8.
 Ta position initiale est A1.
 Chaque utilisateur peut se déplacer de 1 case en ligne droite ou en diagonale.
 Les joueurs jouent chacun leur tour, tu joues en dernier et tu dois attrapper les joueurs en te plaçant sur leur case.
-`
+`;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const modelsDirectory = path.join(__dirname, "..", "models");
@@ -136,7 +141,7 @@ const onInit = function (data) {
   //     chatHistory.push(message)
   //   }
   session.setChatHistory(chatHistory);
-    console.log("chatHistory", chatHistory);
+  console.log("chatHistory", chatHistory);
 };
 
 sync_options.onMessage = onMessage;
