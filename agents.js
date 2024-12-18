@@ -18,18 +18,18 @@ let sync_options = {
   debug: process.env.SYNC_DEBUG,
 };
 
-// const systemPrompt = `Tu participes à une conversation entre plusieurs utilisateurs.
-//   Dans le message qu'il envoie, chaque utilisateur est identifié par une balise <speaker>{{username}}</speaker>.
-//   Tu ne dois utiliser ces balises que pour savoir qui a parlé.
-//   Tu ne dois pas faire apparaitre ces balises dans tes réponses.
-//   `;
-
 const systemPrompt = `Tu participes à une conversation entre plusieurs utilisateurs.
-Vous jouez à un jeu sur un echiquier marqué A à H et 1 à 8.
-Ta position initiale est A1.
-Chaque utilisateur peut se déplacer de 1 case en ligne droite ou en diagonale.
-Les joueurs jouent chacun leur tour, tu joues en dernier et tu dois attrapper les joueurs en te plaçant sur leur case.
-`;
+  Dans le message qu'il envoie, chaque utilisateur est identifié par une balise <speaker>{{username}}</speaker>.
+  Tu ne dois utiliser ces balises que pour savoir qui a parlé.
+  Tu ne dois pas faire apparaitre ces balises dans tes réponses.
+  `;
+
+// const systemPrompt = `Tu participes à une conversation entre plusieurs utilisateurs.
+// Vous jouez à un jeu sur un echiquier marqué A à H et 1 à 8.
+// Ta position initiale est A1.
+// Chaque utilisateur peut se déplacer de 1 case en ligne droite ou en diagonale.
+// Les joueurs jouent chacun leur tour, tu joues en dernier et tu dois attrapper les joueurs en te plaçant sur leur case.
+// `;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const modelsDirectory = path.join(__dirname, "..", "models");
@@ -96,31 +96,44 @@ const onMessage = async function (m) {
   if (m.role != "ai") {
     console.log(chalk.yellow("AI: "));
     console.log(m);
-    vectordb.addMessage({username: m.username, texte: m.text, id: m.id});
+
+let search = await vectordb.search(m.text);
+console.log("search", search);
+
+let texte = "En utilisant le contexte suivant:\n#Contexte:\n";
+texte += JSON.stringify(search);
+texte+= "\n#Repond a ce message:\n<speaker>" + m.username + "</speaker>" + m.text
+
+    vectordb.addMessage({username: m.username, text: m.text, id: m.id});
+
+    console.log("texte", texte)
     const response = await session.prompt(
-      "<speaker>" + m.username + "</speaker>" + m.text,
+      texte,
       { grammar }
     );
 
-    vectordb.addMessage("ai", response);
+
+ 
     console.log(chalk.yellow("AI response: ") + response);
     console.log();
     // console.log(response)
     const parsedRes = grammar.parse(response);
     let message = { text: parsedRes.response, target: parsedRes.speaker };
+    let resp = { text: parsedRes.response, username: 'ai', id: m.id+"-ai" };
+    vectordb.addMessage(resp);
     sync.addMessage(message);
     const initialChatHistory = session.getChatHistory();
-    console.log(initialChatHistory);
+    // console.log(initialChatHistory);
   }
 };
 
 const onInit = function (data) {
-  console.log("should be Initialized with ", data);
+  // console.log("should be Initialized with ", data);
 
   let chatHistory = session.getChatHistory();
   // console.log("chatHistory", chatHistory);
   for (let m of data) {
-    console.log(m);
+    // console.log(m);
     if (m.role == "ai") {
       let response = [];
       let r = { response: m.text, speaker: m.target };
@@ -144,7 +157,7 @@ const onInit = function (data) {
   //     chatHistory.push(message)
   //   }
   session.setChatHistory(chatHistory);
-  console.log("chatHistory", chatHistory);
+  // console.log("chatHistory", chatHistory);
 };
 
 sync_options.onMessage = onMessage;
