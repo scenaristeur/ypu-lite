@@ -23,7 +23,15 @@ const systemPrompt = `Tu participes à une conversation entre plusieurs utilisat
   Tu ne dois utiliser ces balises que pour savoir qui a parlé.
   Tu ne dois pas faire apparaitre ces balises dans tes réponses.
   `;
-
+const rag_prompt= function(username, question, context){
+  return `HUMAIN ${username} :
+Vous êtes un assistant pour les tâches de questions-réponses, désigné ci-dessous par ASSISTANT. Evite de répéter plusieurs fois les mêmes informations. Utilisez les éléments de contexte récupérés suivants pour répondre à la question.
+Si vous ne connaissez pas la réponse, dites simplement que vous ne savez pas. Utilisez trois phrases maximum et gardez la réponse concise.
+Utilisez en priorité les réponses des UTILISATEURS, puis celles de l'ASSISTANT.
+Question : ${question} 
+Contexte : \n${context.map((c) => "\t" + c.username.toUpperCase() + " : " + c.text).join("\n")} 
+Réponse :`
+}
 // const systemPrompt = `Tu participes à une conversation entre plusieurs utilisateurs.
 // Vous jouez à un jeu sur un echiquier marqué A à H et 1 à 8.
 // Ta position initiale est A1.
@@ -100,10 +108,10 @@ const onMessage = async function (m) {
 let search = await vectordb.search(m.text);
 console.log("search", search);
 
-let texte = "En utilisant le contexte suivant:\n#Contexte:\n";
-texte += JSON.stringify(search);
-texte+= "\n#Repond a ce message:\n<speaker>" + m.username + "</speaker>" + m.text
-
+// let texte = "En utilisant le contexte suivant:\n#Contexte:\n";
+// texte += JSON.stringify(search);
+// texte+= "\n#Repond a ce message:\n<speaker>" + m.username + "</speaker>" + m.text
+let texte = rag_prompt(m.username,m.text, search);
     vectordb.addMessage({username: m.username, text: m.text, id: m.id});
 
     console.log("texte", texte)
@@ -119,7 +127,7 @@ texte+= "\n#Repond a ce message:\n<speaker>" + m.username + "</speaker>" + m.tex
     // console.log(response)
     const parsedRes = grammar.parse(response);
     let message = { text: parsedRes.response, target: parsedRes.speaker };
-    let resp = { text: parsedRes.response, username: 'ai', id: m.id+"-ai" };
+    let resp = { text: parsedRes.response, username: 'assistant', id: m.id+"-ai" };
     vectordb.addMessage(resp);
     sync.addMessage(message);
     const initialChatHistory = session.getChatHistory();

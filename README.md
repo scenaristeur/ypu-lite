@@ -38,6 +38,7 @@ in multiple terminals open ```npm run dev```
 - get this embedding model https://huggingface.co/CompendiumLabs/bge-small-en-v1.5-gguf/blob/main/bge-small-en-v1.5-q8_0.gguf into your ./models folder
 - french embedding model https://www.reddit.com/r/LocalLLaMA/comments/1e5bz9d/seeking_recommendations_for_multilanguage/?rdt=51514
 - french embedding : nomic https://huggingface.co/nomic-ai/nomic-embed-text-v1.5-GGUF/tree/main
+- https://neon.tech/blog/building-a-rag-application-with-llama-3-1-and-pgvector
 
 # multi speaker
 - https://huggingface.co/spaces/shivammehta25/Matcha-TTS
