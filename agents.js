@@ -96,10 +96,13 @@ const onMessage = async function (m) {
   if (m.role != "ai") {
     console.log(chalk.yellow("AI: "));
     console.log(m);
+    vectordb.addMessage({username: m.username, texte: m.text, id: m.id});
     const response = await session.prompt(
       "<speaker>" + m.username + "</speaker>" + m.text,
       { grammar }
     );
+
+    vectordb.addMessage("ai", response);
     console.log(chalk.yellow("AI response: ") + response);
     console.log();
     // console.log(response)

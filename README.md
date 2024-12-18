@@ -32,3 +32,6 @@ in multiple terminals open ```npm run dev```
 # voice 
 - https://github.com/ictnlp/LLaMA-Omni
 - https://medium.com/@mahendra0203/ears-for-ai-making-llama-listen-and-learn-c506ac72da39
+
+# embedding & VEctorDB
+- https://lancedb.github.io/lancedb/basic/#using-the-embedding-api
