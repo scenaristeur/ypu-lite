@@ -19,6 +19,13 @@ let sync_options = {
 //   Tu ne dois pas faire apparaitre ces balises dans tes réponses.
 //   `;
 
+const systemPrompt = `Tu participes à une conversation entre plusieurs utilisateurs.
+Vous jouez à un jeu sur un echiquier marqué A à H et 1 à 8.
+Ta position initiale est A1.
+Chaque utilisateur peut se déplacer de 1 case en ligne droite ou en diagonale.
+Les joueurs jouent chacun leur tour, tu joues en dernier et tu dois attrapper les joueurs en te plaçant sur leur case.
+`
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const modelsDirectory = path.join(__dirname, "..", "models");
 
@@ -74,7 +81,7 @@ const context = await model.createContext();
 
 const session = new LlamaChatSession({
   contextSequence: context.getSequence(),
-  // systemPrompt: systemPrompt,
+  systemPrompt: systemPrompt,
   chatWrapper: new MyCustomChatWrapper(),
 });
 // console.log(session)
