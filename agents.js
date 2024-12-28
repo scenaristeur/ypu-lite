@@ -4,8 +4,24 @@ import chalk from "chalk";
 import { getLlama, LlamaChatSession, resolveModelFile } from "node-llama-cpp";
 import { MyCustomChatWrapper } from "./MyCustomChatWrapper.js";
 import { VectorDb } from "./lib/vectordb.js";
+import { readFile } from 'fs/promises';
 
 let vectordb = null;
+
+import minimist from "minimist";
+let args = minimist(process.argv.slice(2));
+console.log(args);
+
+let ai_persona = null
+let ai_name = args._[0]
+if (ai_name) {
+  console.log("ai_name", ai_name)
+  // var json = require('./ai_persona/'+ai_name+'.json'); 
+//  let ai_config = await  fetch('./ai_persona/'+ai_name+'.json')  
+ ai_persona =  JSON.parse(await readFile('./ai_personas/'+ai_name+'.json', "utf8"));
+console.log("ai_persona", ai_persona) 
+
+}
 
 if(process.env.RAG == true && process.env.RAG != 0 ){
   console.log("RAG")
@@ -25,11 +41,14 @@ let sync_options = {
   debug: process.env.SYNC_DEBUG,
 };
 
-const systemPrompt = `Tu participes à une conversation entre plusieurs utilisateurs.
+let  systemPrompt = `Tu participes à une conversation entre plusieurs utilisateurs.
   Dans le message qu'il envoie, chaque utilisateur est identifié par une balise <speaker>{{username}}</speaker>.
   Tu ne dois utiliser ces balises que pour savoir qui a parlé.
   Tu ne dois pas faire apparaitre ces balises dans tes réponses.
   `;
+if (ai_persona &&   ai_persona.systemPrompt) {
+  systemPrompt += ai_persona.systemPrompt
+}
 // const systemPrompt = `Tu participes à une conversation entre plusieurs utilisateurs.
 // Vous jouez à un jeu sur un echiquier marqué A à H et 1 à 8.
 // Ta position initiale est A1.
@@ -90,6 +109,7 @@ const model = await llama.loadModel({ modelPath });
 console.log(chalk.yellow("Creating context..."));
 const context = await model.createContext();
 
+console.log(chalk.yellow("Creating session...", systemPrompt));
 const session = new LlamaChatSession({
   contextSequence: context.getSequence(),
   systemPrompt: systemPrompt,
@@ -181,4 +201,4 @@ const onInit = function (data) {
 sync_options.onMessage = onMessage;
 sync_options.onInit = onInit;
 let sync = new Sync(sync_options);
-sync.setUsername("ai");
+sync.setUsername(ai_persona.name || "ai");

@@ -13,6 +13,8 @@ HOST=localhost PORT=1234 npx y-websocket
 - run the agent
 ```
 npm run agent
+
+or npm run agent Grenouille
 ```
 - run 2 or more users
  
