@@ -5,16 +5,9 @@ import { getLlama, LlamaChatSession, resolveModelFile } from "node-llama-cpp";
 import { MyCustomChatWrapper } from "./MyCustomChatWrapper.js";
 import { VectorDb } from "./lib/vectordb.js";
 
-let vectordb = null;
-
-if(process.env.RAG == true && process.env.RAG != 0 ){
-  console.log("RAG")
-  vectordb = new VectorDb({
-    databaseDir: "./database",
-  });
-  }else{
-    console.log("no RAG")
-  }
+let vectordb = new VectorDb({
+  databaseDir: "./database",
+});
 
 import "dotenv/config";
 import { Sync } from "./lib/sync.js";
@@ -30,6 +23,15 @@ const systemPrompt = `Tu participes à une conversation entre plusieurs utilisat
   Tu ne dois utiliser ces balises que pour savoir qui a parlé.
   Tu ne dois pas faire apparaitre ces balises dans tes réponses.
   `;
+const rag_prompt= function(username, question, context){
+  return `HUMAIN ${username} :
+Vous êtes un assistant pour les tâches de questions-réponses, désigné ci-dessous par ASSISTANT. Evite de répéter plusieurs fois les mêmes informations. Utilisez les éléments de contexte récupérés suivants pour répondre à la question.
+Si vous ne connaissez pas la réponse, dites simplement que vous ne savez pas. Utilisez trois phrases maximum et gardez la réponse concise.
+Utilisez en priorité les réponses des UTILISATEURS, puis celles de l'ASSISTANT.
+Question : ${question} 
+Contexte : \n${context.map((c) => "\t" + c.username.toUpperCase() + " : " + c.text).join("\n")} 
+Réponse :`
+}
 // const systemPrompt = `Tu participes à une conversation entre plusieurs utilisateurs.
 // Vous jouez à un jeu sur un echiquier marqué A à H et 1 à 8.
 // Ta position initiale est A1.
@@ -102,43 +104,31 @@ const onMessage = async function (m) {
   if (m.role != "ai") {
     console.log(chalk.yellow("AI: "));
     console.log(m);
-let response = null
+
+let search = await vectordb.search(m.text);
+console.log("search", search);
 
 // let texte = "En utilisant le contexte suivant:\n#Contexte:\n";
 // texte += JSON.stringify(search);
 // texte+= "\n#Repond a ce message:\n<speaker>" + m.username + "</speaker>" + m.text
-if (process.env.RAG == true && process.env.RAG != 0 ){
-  let search = await vectordb.search(m.text);
-console.log("search", search);
-let texte = vectordb.rag_prompt(m.username,m.text, search);
+let texte = rag_prompt(m.username,m.text, search);
     vectordb.addMessage({username: m.username, text: m.text, id: m.id});
 
     console.log("texte", texte)
-     response = await session.prompt(
+    const response = await session.prompt(
       texte,
       { grammar }
     );
-    console.log("response", response);
-  } else {
-    let text = "<speaker>" + m.username + "</speaker>" + m.text
-    console.log("texte", text)
-    response = await session.prompt(
-      text,
-      { grammar }
-    );
-    console.log("response", response);
-  }
+
 
  
     console.log(chalk.yellow("AI response: ") + response);
-
+    console.log();
     // console.log(response)
     const parsedRes = grammar.parse(response);
     let message = { text: parsedRes.response, target: parsedRes.speaker };
     let resp = { text: parsedRes.response, username: 'assistant', id: m.id+"-ai" };
-    if (process.env.RAG == true && process.env.RAG != 0 ){
     vectordb.addMessage(resp);
-    }
     sync.addMessage(message);
     const initialChatHistory = session.getChatHistory();
     // console.log(initialChatHistory);
