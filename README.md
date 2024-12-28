@@ -23,7 +23,7 @@ npm run agent
 or create your agent in ./ai_personas/
 
 or npm run agent Grenouille
-or npm run agent Botanique
+or npm run agent BotanikAi
 ```
 - run 2 or more users
  
