@@ -20,8 +20,10 @@ first download the model from (!!! point ou tiret !!! ) https://huggingface.co/b
 
 ```
 npm run agent
+or create your agent in ./ai_personas/
 
 or npm run agent Grenouille
+or npm run agent Expert
 ```
 - run 2 or more users
  
