@@ -11,6 +11,13 @@ HOST=localhost PORT=1234 npx y-websocket
 
 ```
 - run the agent
+
+first download the model from (!!! point ou tiret !!! ) https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/tree/mainwith  https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf?download=true and store it in `./models/` folder or here https://huggingface.co/ThomasBaruzier/Llama-3.2-1B-Instruct-GGUF/tree/main 
+
+
+> debug sans rag 
+`NODE_DEBUG=cluster,net,http,fs,tls,module,timers node "agents copy 3.js" `
+
 ```
 npm run agent
 
