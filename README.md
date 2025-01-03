@@ -11,6 +11,7 @@ HOST=localhost PORT=1234 npx y-websocket
 
 ```
 - run the agent
+- llama 3.2 https://github.com/meta-llama/llama-models/blob/main/models/llama3_2/MODEL_CARD.md
 
 first download the model from (!!! point ou tiret !!! ) https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/tree/mainwith  https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf?download=true and store it in `./models/` folder or here https://huggingface.co/ThomasBaruzier/Llama-3.2-1B-Instruct-GGUF/tree/main 
 
@@ -24,8 +25,18 @@ or create your agent in ./ai_personas/
 
 or npm run agent Grenouille
 or npm run agent BotanikAi
+
 ```
+
+- run conversation
+```
+npm run conv BotanikAi
+```
+
+
+
 - run 2 or more users
+
  
 ```bash
 npm run dev John
@@ -53,3 +64,15 @@ in multiple terminals open ```npm run dev```
 
 # multi speaker
 - https://huggingface.co/spaces/shivammehta25/Matcha-TTS
+
+# interessant 
+article anthorpic Agent ou workflow ?
+- https://www.anthropic.com/research/building-effective-agents
+- https://github.com/modelcontextprotocol/servers/tree/main/src/memory
+- https://github.com/modelcontextprotocol/servers/blob/main/src/memory/index.ts
+
+# ModelContextProtocol
+- https://github.com/modelcontextprotocol/servers
+- https://github.com/modelcontextprotocol
+- client https://modelcontextprotocol.io/quickstart/client
+- ts client https://github.com/modelcontextprotocol/typescript-sdk

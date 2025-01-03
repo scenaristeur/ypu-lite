@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { getLlama, LlamaChatSession, resolveModelFile } from "node-llama-cpp";
 import { MyCustomChatWrapper } from "./MyCustomChatWrapper.js";
 import { VectorDb } from "./lib/vectordb.js";
-import { readFile } from 'fs/promises';
+import { readFile } from "fs/promises";
 
 let vectordb = null;
 
@@ -12,25 +12,24 @@ import minimist from "minimist";
 let args = minimist(process.argv.slice(2));
 console.log(args);
 
-let ai_persona = null
-let ai_name = args._[0]
+let ai_persona = null;
+let ai_name = args._[0];
 if (ai_name) {
-  console.log("ai_name", ai_name)
-  // var json = require('./ai_persona/'+ai_name+'.json'); 
-//  let ai_config = await  fetch('./ai_persona/'+ai_name+'.json')  
- ai_persona =  JSON.parse(await readFile('./ai_personas/'+ai_name+'.json', "utf8"));
-console.log("ai_persona", ai_persona) 
-
+  console.log("ai_name", ai_name);
+  ai_persona = JSON.parse(
+    await readFile("./ai_personas/" + ai_name + ".json", "utf8")
+  );
+  console.log("ai_persona", ai_persona);
 }
 
-if(process.env.RAG == true && process.env.RAG != 0 ){
-  console.log("RAG")
+if (process.env.RAG == true && process.env.RAG != 0) {
+  console.log("RAG");
   vectordb = new VectorDb({
     databaseDir: "./database",
   });
-  }else{
-    console.log("no RAG")
-  }
+} else {
+  console.log("no RAG");
+}
 
 import "dotenv/config";
 import { Sync } from "./lib/sync.js";
@@ -41,13 +40,13 @@ let sync_options = {
   debug: process.env.SYNC_DEBUG,
 };
 
-let  systemPrompt = `Tu participes à une conversation entre plusieurs utilisateurs.
+let systemPrompt = `Tu participes à une conversation entre plusieurs utilisateurs.
   Dans le message qu'il envoie, chaque utilisateur est identifié par une balise <speaker>{{username}}</speaker>.
   Tu ne dois utiliser ces balises que pour savoir qui a parlé.
   Tu ne dois pas faire apparaitre ces balises dans tes réponses.
   `;
-if (ai_persona &&   ai_persona.systemPrompt) {
-  systemPrompt += ai_persona.systemPrompt
+if (ai_persona && ai_persona.systemPrompt) {
+  systemPrompt += ai_persona.systemPrompt;
 }
 // const systemPrompt = `Tu participes à une conversation entre plusieurs utilisateurs.
 // Vous jouez à un jeu sur un echiquier marqué A à H et 1 à 8.
@@ -122,42 +121,39 @@ const onMessage = async function (m) {
   if (m.role != "ai") {
     console.log(chalk.yellow("AI: "));
     console.log(m);
-let response = null
+    let response = null;
 
-// let texte = "En utilisant le contexte suivant:\n#Contexte:\n";
-// texte += JSON.stringify(search);
-// texte+= "\n#Repond a ce message:\n<speaker>" + m.username + "</speaker>" + m.text
-if (process.env.RAG == true && process.env.RAG != 0 ){
-  let search = await vectordb.search(m.text);
-console.log("search", search);
-let texte = vectordb.rag_prompt(m.username,m.text, search);
-    vectordb.addMessage({username: m.username, text: m.text, id: m.id});
+    // let texte = "En utilisant le contexte suivant:\n#Contexte:\n";
+    // texte += JSON.stringify(search);
+    // texte+= "\n#Repond a ce message:\n<speaker>" + m.username + "</speaker>" + m.text
+    if (process.env.RAG == true && process.env.RAG != 0) {
+      let search = await vectordb.search(m.text);
+      console.log("search", search);
+      let texte = vectordb.rag_prompt(m.username, m.text, search);
+      vectordb.addMessage({ username: m.username, text: m.text, id: m.id });
 
-    console.log("texte", texte)
-     response = await session.prompt(
-      texte,
-      { grammar }
-    );
-    console.log("response", response);
-  } else {
-    let text = "<speaker>" + m.username + "</speaker>" + m.text
-    console.log("texte", text)
-    response = await session.prompt(
-      text,
-      { grammar }
-    );
-    console.log("response", response);
-  }
+      console.log("texte", texte);
+      response = await session.prompt(texte, { grammar });
+      console.log("response", response);
+    } else {
+      let text = "<speaker>" + m.username + "</speaker>" + m.text;
+      console.log("texte", text);
+      response = await session.prompt(text, { grammar });
+      console.log("response", response);
+    }
 
- 
     console.log(chalk.yellow("AI response: ") + response);
 
     // console.log(response)
     const parsedRes = grammar.parse(response);
     let message = { text: parsedRes.response, target: parsedRes.speaker };
-    let resp = { text: parsedRes.response, username: 'assistant', id: m.id+"-ai" };
-    if (process.env.RAG == true && process.env.RAG != 0 ){
-    vectordb.addMessage(resp);
+    let resp = {
+      text: parsedRes.response,
+      username: "assistant",
+      id: m.id + "-ai",
+    };
+    if (process.env.RAG == true && process.env.RAG != 0) {
+      vectordb.addMessage(resp);
     }
     sync.addMessage(message);
     const initialChatHistory = session.getChatHistory();
