@@ -3,6 +3,10 @@
 https://www.radiofrance.fr/fip/radio-groove
 
 # run multiuser chat
+
+nvm install node
+nvm use 23
+
 in 4 different terminals
 
 - run the provider 

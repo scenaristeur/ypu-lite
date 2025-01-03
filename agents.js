@@ -201,4 +201,4 @@ const onInit = function (data) {
 sync_options.onMessage = onMessage;
 sync_options.onInit = onInit;
 let sync = new Sync(sync_options);
-sync.setUsername(ai_persona.name || "ai");
+sync.setUsername(ai_persona && ai_persona.name || "ai");
