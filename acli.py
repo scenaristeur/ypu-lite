@@ -1,18 +1,26 @@
-import os , time
 import asyncio
 from httpx_ws import aconnect_ws
-from pycrdt import Doc, Map, Array, ArrayEvent
+from pycrdt import Doc, Map, Array
 from pycrdt_websocket import WebsocketProvider
 from pycrdt_websocket.websocket import HttpxWebsocket
-from dotenv import load_dotenv
-load_dotenv()  # take environment variables from .env.
-
-sync_url = os.getenv ("SYNC_URL") or 'ws://localhost:1234'
-sync_room = os.getenv ("SYNC_ROOM") or 'vue-yjs-demo-messages'
+import time
 
 ydoc = Doc()
+# 
+room_name = "vue-yjs-demo-messages"
 yarray = ydoc.get("conversation1", type=Array);
 
+
+
+
+import threading
+
+# def printit():
+#   threading.Timer(5.0, printit).start()
+#   print ("Hello, World!")
+#   ymap["key"] = time.time()
+
+# printit()
 
 async def user_input():
     while True:
@@ -33,40 +41,24 @@ async def user_input():
         yarray.append(ymap)
 
 def handle_deep_changes(events):
-    # print(events)
-    # print("to_py\n", yarray.to_py())
-
-
-    for event in events:
-        print("-" , event.target)
-        # for item in event.delta[0]["insert"]:
-        #     print("item", item.to_py())        
-    print("User:")
-
-
-def handle_deep_changes1(events: list[ArrayEvent]):
-# process the events
-    print("to_py\n", yarray.to_py()) 
     print(events)
-    for event in events:
-        print("-", event.target)
-        print("\ndelta\n", event.delta)
-        print("\npath\n", event.path)
-        print("\insert\n", event.delta[0]["insert"])
-        for item in event.delta[0]["insert"]:
-            print("item", item.to_py())
-        print("\ninsert to_py\n", event.delta[0]["insert"])
+    print("to_py\n", yarray.to_py())
+    print("User:")
 
 async def client():
 
     async with (
-        aconnect_ws(f"{sync_url}/{sync_room}") as websocket,
-        WebsocketProvider(ydoc, HttpxWebsocket(websocket, sync_room)),
+        aconnect_ws(f"http://localhost:1234/{room_name}") as websocket,
+        WebsocketProvider(ydoc, HttpxWebsocket(websocket, room_name)),
     ):
+        # Changes to remote ydoc are applied to local ydoc.
+        # Changes to local ydoc are sent over the WebSocket and
+        # broadcast to all clients.
+        # ymap["key"] = time.time()
+
+        # array0_subscription_id = ymap.observe_deep(handle_deep_changes)
         array0_subscription_id = yarray.observe_deep(handle_deep_changes)
-        
         await asyncio.Future()  # run forever
-    
 
 # asyncio.run(client())
 async def main():
