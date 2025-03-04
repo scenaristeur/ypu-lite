@@ -10,17 +10,28 @@ in 4 different terminals
 HOST=localhost PORT=1234 npx y-websocket
 
 ```
-- run the agent
+- run the ai agent
 ```
 npm run agent
 ```
-- run 2 or more users
+- run 2 or more javascript clients/users
  
 ```bash
 npm run dev John
 # or 
 npm run dev Jane
 ```
+
+- run a python client
+```
+. .venv/bin/activate
+python client.py
+
+```
+
+
+![alt text](image.png)
+
 
 # YJS provider
 https://docs.yjs.dev/ecosystem/connection-provider/y-websocket
